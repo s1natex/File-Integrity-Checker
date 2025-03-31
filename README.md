@@ -3,6 +3,10 @@ Verify the integrity of application log files to detect tampering
 # Project Page:
 https://roadmap.sh/projects/file-integrity-checker
 # How to use:
+- Clone Repository
+```
+git clone https://github.com/s1natex/File-Integrity-Checker
+```
 - Ensure Python3 is installed
 ```
 python3 --version
