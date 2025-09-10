@@ -63,7 +63,9 @@ def stable_entries_bytes(entries: Dict[str, str]) -> bytes:
     return json.dumps(entries, sort_keys=True, separators=(",", ":")).encode("utf-8")
 
 
-def verify_signature(db: Dict[str, Any], key_env: str = "INTEGRITY_KEY") -> Optional[bool]:
+def verify_signature(
+    db: Dict[str, Any], key_env: str = "INTEGRITY_KEY"
+) -> Optional[bool]:
     key = os.environ.get(key_env)
     if not key or not db.get("signature"):
         return None
@@ -213,9 +215,9 @@ def cmd_check(
         "missing": len(missing_list),
         "new": len(new),
         "errors": len(errors),
-        "db_signature_verified": (True if sig_ok else False)
-        if sig_ok is not None
-        else None,
+        "db_signature_verified": (
+            (True if sig_ok else False) if sig_ok is not None else None
+        ),
     }
 
     if json_out:
@@ -288,7 +290,7 @@ def build_parser() -> argparse.ArgumentParser:
     common.add_argument(
         "--pattern",
         default=DEFAULT_PATTERN,
-        help=f'Filename glob when PATH is a directory (default: {DEFAULT_PATTERN})',
+        help=f"Filename glob when PATH is a directory (default: {DEFAULT_PATTERN})",
     )
     common.add_argument(
         "--follow-symlinks", action="store_true", help="Resolve symlinks (default: off)"
@@ -301,11 +303,16 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_init = sub.add_parser("init", parents=[common], help="Initialize hashes")
     p_init.add_argument(
-        "--algo", choices=SUPPORTED_ALGOS.keys(), default="sha256", help="Hash algorithm"
+        "--algo",
+        choices=SUPPORTED_ALGOS.keys(),
+        default="sha256",
+        help="Hash algorithm",
     )
 
     p_check = sub.add_parser("check", parents=[common], help="Check hashes")
-    p_check.add_argument("--json", action="store_true", help="JSON output (results + summary)")
+    p_check.add_argument(
+        "--json", action="store_true", help="JSON output (results + summary)"
+    )
 
     # create the 'update' subparser without binding to a variable (avoids ruff F841)
     sub.add_parser("update", parents=[common], help="Update stored hash(es)")
@@ -322,14 +329,26 @@ def main() -> None:
 
     if args.command == "init":
         cmd_init(
-            path, db_path, args.pattern, args.algo, args.follow_symlinks, args.include_symlinks
+            path,
+            db_path,
+            args.pattern,
+            args.algo,
+            args.follow_symlinks,
+            args.include_symlinks,
         )
     elif args.command == "check":
         cmd_check(
-            path, db_path, args.pattern, args.json, args.follow_symlinks, args.include_symlinks
+            path,
+            db_path,
+            args.pattern,
+            args.json,
+            args.follow_symlinks,
+            args.include_symlinks,
         )
     elif args.command == "update":
-        cmd_update(path, db_path, args.pattern, args.follow_symlinks, args.include_symlinks)
+        cmd_update(
+            path, db_path, args.pattern, args.follow_symlinks, args.include_symlinks
+        )
 
 
 if __name__ == "__main__":
