@@ -27,7 +27,7 @@ jobs:
       - name: Ruff (lint)
         run: ruff check .
       - name: Black (format check)
-        run: black --check .
+        run: black --check --diff .
 
   test:
     name: Smoke Test (matrix)
