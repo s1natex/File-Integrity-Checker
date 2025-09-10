@@ -1,0 +1,107 @@
+name: CI
+
+on:
+  push:
+    branches: [ main]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main]
+
+permissions:
+  contents: read
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  PIP_NO_PYTHON_VERSION_WARNING: "1"
+
+jobs:
+  lint:
+    name: Lint (ruff + black)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --upgrade pip ruff black
+      - name: Ruff (lint)
+        run: ruff check .
+      - name: Black (format check)
+        run: black --check .
+
+  test:
+    name: Smoke Test (matrix)
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install package (editable)
+        run: python -m pip install --upgrade pip && python -m pip install -e .
+      - name: cLI smoke integrity-check --help
+        shell: bash
+        run: |
+          set -e
+          integrity-check --help >/dev/null
+
+  build:
+    name: Build (wheel + sdist)
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build
+        run: |
+          python -m pip install --upgrade pip build
+          python -m build
+      - name: Upload dist artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/*
+
+  verify-wheel:
+    name: Verify wheel with pipx
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install via pipx and smoke test
+        run: |
+          python -m pip install --upgrade pip pipx
+          python -m pipx ensurepath
+          pipx install dist/*.whl
+          integrity-check --help >/dev/null
+
+#   publish:
+#     name: Publish to PyPI (tagged releases)
+#     if: startsWith(github.ref, 'refs/tags/v')
+#     needs: [build, verify-wheel]
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: read
+#     steps:
+#       - uses: actions/download-artifact@v4
+#         with:
+#           name: dist
+#           path: dist
+#       - name: Publish to PyPI
+#         uses: pypa/gh-action-pypi-publish@release/v1
+#         with:
+#           password: ${{ secrets.PYPI_API_TOKEN }}
+          # repository-url: https://test.pypi.org/legacy/   # uncomment to publish to TestPyPI
