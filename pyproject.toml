@@ -1,0 +1,26 @@
+[build-system]
+requires = ["hatchling>=1.18.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "file-integrity-checker"
+version = "0.1.0"
+description = "Verify the integrity of application log files to detect tampering"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [{ name = "Your Name", email = "you@example.com" }]
+keywords = ["security", "integrity", "logs", "forensics", "cli"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Environment :: Console",
+  "Topic :: Security",
+  "Topic :: System :: Logging"
+]
+
+[project.scripts]
+integrity-check = "integrity_checker.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["integrity_checker"]
