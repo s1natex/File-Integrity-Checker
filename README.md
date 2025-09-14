@@ -4,7 +4,7 @@ Verify the integrity of application log files to detect tampering.
 This tool computes and stores cryptographic hashes of log files, then checks them later to detect if anything has been modified, deleted, or newly added.
 CI with linting and smoke tests, uncomment to Publish to PyPI (tagged releases)
 
-[![CI](https://github.com/s1natex/File-Integrity-Checker/actions/workflows/CI.yaml/badge.svg?branch=main)](https://github.com/s1natex/File-Integrity-Checker/actions/workflows/CI.yaml)
+[![CI](https://github.com/s1natex/File-Integrity-Checker/actions/workflows/ci.yml/badge.svg)](https://github.com/s1natex/File-Integrity-Checker/actions/workflows/ci.yml)
 
 # [Project Page](https://roadmap.sh/projects/file-integrity-checker)
 
