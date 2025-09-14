@@ -216,13 +216,6 @@ jobs:
           whl=$(ls dist/*.whl | head -n1)
           mkdir -p /tmp/integrity-test
           echo "dummy" > /tmp/integrity-test/file.txt
-          pipx run --spec "$whl" integrity-check /tmp/integrity-test >/dev/null
-
-
-#   publish:
-#     name: Publish to PyPI (tagged releases)
-#     if: startsWith(github.ref, 'refs/tags/v')
-#     needs: [build, verify-wheel, dast]
-#     runs-on: ubuntu-latest
-#     permissions:
-#       c
+          # initialize baseline, then verify
+          pipx run --spec "$whl" integrity-check init /tmp/integrity-test
+          pipx run --spec "$whl" integrity-check check /tmp/integrity-test >/dev/null
