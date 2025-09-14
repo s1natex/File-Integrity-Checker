@@ -55,9 +55,20 @@ integrity-check check C:\path\to\logs >> C:\Users\<YourName>\integrity-check.log
 
 ### 1. Clone and build
 ```bash
-git clone https://github.com/yourusername/file-integrity-checker.git
+git clone https://github.com/s1natex/File-Integrity-Checker
 cd file-integrity-checker
+
+sudo apt update
+sudo apt install -y python3-pip python3-venv
+
+python3 -m pip install --upgrade pip
 python3 -m pip install --upgrade build pipx
+python3 -m pipx ensurepath
+
+# make sure current shell sees ~/.local/bin
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+
 python3 -m build
 ```
 
