@@ -178,12 +178,14 @@ jobs:
           key: ${{ runner.os }}-pip-verify-${{ hashFiles('**/pyproject.toml') }}
           restore-keys: |
             ${{ runner.os }}-pip-
-      - name: Install via pipx and smoke test
+      - name: Run CLI from wheel with pipx (smoke)
+        shell: bash
         run: |
+          set -euo pipefail
           python -m pip install --upgrade pip pipx==1.7.1
-          # ensurepath won't affect this non-login shell; call the binary directly:
-          pipx install --force dist/*.whl
-          ~/.local/bin/integrity-check --help >/dev/null
+          whl=$(ls dist/*.whl | head -n1)
+          # basic "does it run" check
+          pipx run --spec "$whl" integrity-check --help >/dev/null
 
   dast:
     name: Dynamic Smoke Security Test
@@ -206,13 +208,16 @@ jobs:
           key: ${{ runner.os }}-pip-dast-${{ hashFiles('**/pyproject.toml') }}
           restore-keys: |
             ${{ runner.os }}-pip-
-      - name: Install via pipx and run against sample
+      - name: Run CLI from wheel with pipx (runtime sample)
+        shell: bash
         run: |
+          set -euo pipefail
           python -m pip install --upgrade pip pipx==1.7.1
-          pipx install --force dist/*.whl
+          whl=$(ls dist/*.whl | head -n1)
           mkdir -p /tmp/integrity-test
           echo "dummy" > /tmp/integrity-test/file.txt
-          ~/.local/bin/integrity-check /tmp/integrity-test >/dev/null
+          pipx run --spec "$whl" integrity-check /tmp/integrity-test >/dev/null
+
 
 #   publish:
 #     name: Publish to PyPI (tagged releases)
